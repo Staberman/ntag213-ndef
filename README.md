@@ -7,8 +7,10 @@ NDEF bytes that **iOS background tag reading actually accepts**, plus an NTAG213
 Zero dependencies. Pure functions in, bytes out — nothing here touches hardware, so all of it is testable without a tag.
 
 ```sh
-npm install ntag213-ndef
+npm install github:Staberman/ntag213-ndef
 ```
+
+<sub>The name `ntag213-ndef` is reserved on npm; the registry is under maintenance as of publication. Installing from git builds the package on install.</sub>
 
 ## Why this exists
 

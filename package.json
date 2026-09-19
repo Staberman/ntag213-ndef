@@ -2,18 +2,41 @@
   "name": "ntag213-ndef",
   "version": "1.0.0",
   "description": "NDEF bytes that iOS background tag reading actually accepts, plus an NTAG213 lock verifier that reads the right page.",
-  "keywords": ["nfc", "ndef", "ntag213", "ntag", "web-nfc", "ios", "nfc-tag", "type-2-tag", "rfid"],
+  "keywords": [
+    "nfc",
+    "ndef",
+    "ntag213",
+    "ntag",
+    "web-nfc",
+    "ios",
+    "nfc-tag",
+    "type-2-tag",
+    "rfid"
+  ],
   "license": "MIT",
   "author": "Lautaro Antunez <lautaro@staberman.com.ar>",
-  "repository": { "type": "git", "url": "git+https://github.com/Staberman/ntag213-ndef.git" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Staberman/ntag213-ndef.git"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
-  "files": ["dist"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "sideEffects": false,
-  "engines": { "node": ">=18" },
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
+    "prepare": "npm run build",
     "build": "tsc -p tsconfig.build.json",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
