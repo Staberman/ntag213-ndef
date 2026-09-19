@@ -44,5 +44,8 @@
   "devDependencies": {
     "typescript": "^5.6.0",
     "vitest": "^2.1.0"
+  },
+  "bugs": {
+    "url": "https://github.com/Staberman/ntag213-ndef/issues"
   }
 }

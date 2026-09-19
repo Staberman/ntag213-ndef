@@ -36,9 +36,10 @@ describe('the page 28h trap', () => {
     expect(check?.passed).toBe(true);
   });
 
-  it('is the only decisive check that rests on the static lock bits', () => {
+  it('never lets page 28h decide anything', () => {
     const decisive = verifyLockEvidence(URI, LOCKED).checks.filter((c) => c.decisive);
-    expect(decisive.map((c) => c.name)).toEqual(['static_lock_covers_payload']);
+    expect(decisive.map((c) => c.name)).toEqual(['payload_fits_tag', 'static_lock_covers_payload']);
+    expect(decisive.map((c) => c.name)).not.toContain('dynamic_lock_as_expected');
   });
 });
 
@@ -130,5 +131,28 @@ describe('parseHexBytes', () => {
 
   it('refuses a half byte', () => {
     expect(parseHexBytes('04 1')).toBeNull();
+  });
+});
+
+describe('a payload the tag could never have held', () => {
+  const TOO_LONG = 'a'.repeat(200);
+
+  it('is never called locked, whatever the lock bytes say', () => {
+    const report = verifyLockEvidence(TOO_LONG, { ...LOCKED, staticLock: [0xff, 0xff] });
+    expect(report.verdict).toBe('not_locked');
+    expect(report.locked).toBe(false);
+  });
+
+  it('says so, instead of reporting a nonsense page range', () => {
+    const check = verifyLockEvidence(TOO_LONG, LOCKED).checks.find((c) => c.name === 'payload_fits_tag');
+    expect(check).toMatchObject({ passed: false, decisive: true });
+  });
+
+  it('treats a non-ASCII URI the same way', () => {
+    expect(verifyLockEvidence('ejemplo.com/ñ', { ...LOCKED, staticLock: [0xff, 0xff] }).verdict).toBe('not_locked');
+  });
+
+  it('still passes a URI that does fit', () => {
+    expect(verifyLockEvidence(URI, LOCKED).checks.find((c) => c.name === 'payload_fits_tag')?.passed).toBe(true);
   });
 });

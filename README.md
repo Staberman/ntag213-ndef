@@ -1,16 +1,18 @@
 # ntag213-ndef
 
-[![CI](https://github.com/Staberman/ntag213-ndef/actions/workflows/ci.yml/badge.svg)](https://github.com/Staberman/ntag213-ndef/actions/workflows/ci.yml) [![npm](https://img.shields.io/npm/v/ntag213-ndef?style=flat-square)](https://www.npmjs.com/package/ntag213-ndef) [![deps](https://img.shields.io/badge/dependencies-none-success?style=flat-square)](package.json)
+[![CI](https://github.com/Staberman/ntag213-ndef/actions/workflows/ci.yml/badge.svg)](https://github.com/Staberman/ntag213-ndef/actions/workflows/ci.yml) [![deps](https://img.shields.io/badge/dependencies-none-success?style=flat-square)](package.json)
+
+Writing a URL to an NFC sticker so that tapping it opens your site — on an iPhone as well as on Android — and then proving the sticker is really locked.
 
 NDEF bytes that **iOS background tag reading actually accepts**, plus an NTAG213 lock verifier that reads the right page.
 
-Zero dependencies. Pure functions in, bytes out — nothing here touches hardware, so all of it is testable without a tag.
+Zero dependencies, ESM only. Pure functions in, bytes out — nothing here touches hardware, so all of it is testable without a tag.
 
 ```sh
 npm install github:Staberman/ntag213-ndef
 ```
 
-<sub>The name `ntag213-ndef` is reserved on npm; the registry is under maintenance as of publication. Installing from git builds the package on install.</sub>
+<sub>Not on npm yet — installing from git builds the package on install.</sub>
 
 ## Why this exists
 
@@ -86,7 +88,8 @@ When the URI grows past page `0Fh`, static lock bits **cannot** reach it. `paylo
 payloadPages('example.com/' + 'a'.repeat(80));
 // [0x04 … 0x0f, 0x10, 0x11 … 0x1e]   ← reaches past the static range
 
-verifyLockEvidence(longUri, { ...evidence, staticLock: [0xff, 0xff] }).verdict;
+const longUri = 'example.com/' + 'a'.repeat(80);
+verifyLockEvidence(longUri, { uid: '04a1b2c3d4e5f6', staticLock: [0xff, 0xff], capabilityContainerAccess: 0x0f, dynamicLock: [0, 0, 0, 0xbd] }).verdict;
 // 'cc_only' — every static bit is set and it still refuses to say locked
 ```
 

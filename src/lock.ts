@@ -77,6 +77,8 @@ export interface LockEvidence {
 }
 
 export const LOCK_CHECKS = [
+  /** The payload fits the tag at all. Nothing below means anything if it does not. */
+  'payload_fits_tag',
   /** Every page holding a byte of the payload has its static lock bit set. */
   'static_lock_covers_payload',
   /** The CC access byte reads `0Fh`. Necessary, nowhere near sufficient. */
@@ -225,6 +227,18 @@ export function verifyLockEvidence(uriField: string, evidence: LockEvidence): Lo
   const requiredPages = payloadPages(uriField);
   const unlockedPages = requiredPages.filter((page) => !isPageStaticallyLocked(page, lockByte2, lockByte3));
 
+  // A URI that is not ASCII or does not fit the tag produces no pages at all.
+  // Without this check the report would say "pages 00h-00h locked" and hand
+  // back a verdict for a card that could never have held the payload — the
+  // same failure this module exists to prevent, one level up.
+  const fitsCheck: LockCheck = {
+    name: 'payload_fits_tag',
+    passed: requiredPages.length > 0,
+    decisive: true,
+    expected: 'a URI that encodes and fits the NDEF area',
+    found: requiredPages.length > 0 ? 'fits' : 'does not encode or does not fit',
+  };
+
   const staticCheck: LockCheck = {
     name: 'static_lock_covers_payload',
     passed: requiredPages.length > 0 && unlockedPages.length === 0,
@@ -258,7 +272,13 @@ export function verifyLockEvidence(uriField: string, evidence: LockEvidence): Lo
     found: hexBytes([...evidence.dynamicLock]),
   };
 
-  const verdict: LockVerdict = staticCheck.passed ? 'locked' : ccAccessCheck.passed ? 'cc_only' : 'not_locked';
+  const verdict: LockVerdict = !fitsCheck.passed
+    ? 'not_locked'
+    : staticCheck.passed
+      ? 'locked'
+      : ccAccessCheck.passed
+        ? 'cc_only'
+        : 'not_locked';
 
   return {
     verdict,
@@ -266,6 +286,6 @@ export function verifyLockEvidence(uriField: string, evidence: LockEvidence): Lo
     uid: evidence.uid,
     requiredPages,
     unlockedPages,
-    checks: [staticCheck, ccAccessCheck, ccPageCheck, dynamicCheck],
+    checks: [fitsCheck, staticCheck, ccAccessCheck, ccPageCheck, dynamicCheck],
   };
 }
