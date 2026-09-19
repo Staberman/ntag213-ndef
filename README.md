@@ -1,5 +1,7 @@
 # ntag213-ndef
 
+[![CI](https://github.com/Staberman/ntag213-ndef/actions/workflows/ci.yml/badge.svg)](https://github.com/Staberman/ntag213-ndef/actions/workflows/ci.yml) [![npm](https://img.shields.io/npm/v/ntag213-ndef?style=flat-square)](https://www.npmjs.com/package/ntag213-ndef) [![deps](https://img.shields.io/badge/dependencies-none-success?style=flat-square)](package.json)
+
 NDEF bytes that **iOS background tag reading actually accepts**, plus an NTAG213 lock verifier that reads the right page.
 
 Zero dependencies. Pure functions in, bytes out — nothing here touches hardware, so all of it is testable without a tag.
