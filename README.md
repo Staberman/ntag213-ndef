@@ -1,6 +1,6 @@
 # ntag213-ndef
 
-[![CI](https://github.com/Staberman/ntag213-ndef/actions/workflows/ci.yml/badge.svg)](https://github.com/Staberman/ntag213-ndef/actions/workflows/ci.yml) [![deps](https://img.shields.io/badge/dependencies-none-success?style=flat-square)](package.json)
+[![CI](https://github.com/Staberman/ntag213-ndef/actions/workflows/ci.yml/badge.svg)](https://github.com/Staberman/ntag213-ndef/actions/workflows/ci.yml) [![npm](https://img.shields.io/npm/v/ntag213-ndef?style=flat-square&color=CB3837)](https://www.npmjs.com/package/ntag213-ndef) [![deps](https://img.shields.io/badge/dependencies-none-success?style=flat-square)](package.json)
 
 Writing a URL to an NFC sticker so that tapping it opens your site — on an iPhone as well as on Android — and then proving the sticker is really locked.
 
@@ -9,10 +9,8 @@ NDEF bytes that **iOS background tag reading actually accepts**, plus an NTAG213
 Zero dependencies, ESM only. Pure functions in, bytes out — nothing here touches hardware, so all of it is testable without a tag.
 
 ```sh
-npm install github:Staberman/ntag213-ndef
+npm install ntag213-ndef
 ```
-
-<sub>Not on npm yet — installing from git builds the package on install.</sub>
 
 ## Why this exists
 
