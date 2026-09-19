@@ -63,6 +63,31 @@ report.checks;  // four named checks, each with expected vs found
 | `cc_only` | The Capability Container reads `0Fh` but no lock bit is set. **NDEF-aware apps refuse to write; a raw Type-2 writer does not.** The card is still rewritable. |
 | `not_locked` | Neither. Nothing took. |
 
+### What `locked` guarantees, precisely
+
+**Every page that holds a byte of *your* payload has its static lock bit set.** Not "the tag is immutable."
+
+The NTAG213 address space is split, and both halves matter:
+
+| Region | Locked by | Covers |
+|---|---|---|
+| Pages `03h`–`0Fh` | **static** lock bits, page `02h` | the CC plus the first 48 bytes of user memory |
+| Pages `10h`–`27h` | **dynamic** lock bytes, page `28h` | the remaining 96 bytes, at 2-page granularity |
+
+A short `https://` URI fits inside `04h`–`0Eh`, so the static bits cover all of it and page `28h` is irrelevant — which is exactly why a correct card reads `00 00 00 BD` there.
+
+When the URI grows past page `0Fh`, static lock bits **cannot** reach it. `payloadPages()` derives the range from the layout rather than assuming it, those pages come back in `unlockedPages`, and the verdict is never `locked`:
+
+```ts
+payloadPages('example.com/' + 'a'.repeat(80));
+// [0x04 … 0x0f, 0x10, 0x11 … 0x1e]   ← reaches past the static range
+
+verifyLockEvidence(longUri, { ...evidence, staticLock: [0xff, 0xff] }).verdict;
+// 'cc_only' — every static bit is set and it still refuses to say locked
+```
+
+If you need pages above `0Fh` genuinely locked, you must set the dynamic lock bytes yourself; most phone apps and Chrome's `makeReadOnly()` do not touch them.
+
 `cc_only` is the one people miss. Chrome's `makeReadOnly()` and most phone apps flip the CC and leave the lock bits alone, which looks locked to every tool that asks politely.
 
 The required pages are **derived from the layout**, not hardcoded — so when a URI grows past page `0Fh`, where no static lock bit exists, those pages report unlocked instead of being silently approved.
